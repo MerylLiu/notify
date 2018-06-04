@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="/stylesheets/toast.style.css" rel="stylesheet">
+
+    <script src="/javascripts/jquery-1.11.3.js"></script>
+    <script src="/javascripts/toast.script.js"></script>
+    <!--[if IE 7]>
+    <script src="/public/javascripts/json2.js"></script>
+    <![endif]-->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket;
+
+        $(function(){
+            initSocket();
+        })
+
+        function initSocket(){
+            socket = io("http://" + location.host);
+
+            socket.emit("add_client", $('#name').html());
+
+            socket.on("new_message", function(data){
+                console.log(data)
+                data = eval("(" + data + ")");
+                if (data.sender != $("#name").html()){
+                    $("#msg").append(data.msg+"<br/>");
+                    addToast(data.msg);
+                }
+            });
+
+            socket.on("user_status", function(data){
+                $("#client-count").text("Online User: "+data.length);
+                $("#clients").children().remove();
+                for(var i = 0; i<data.length; i++){
+                    $("#clients").append("<span id='client'>"+data[i]["clientName"]+"</span>")
+                }
+            })
+        }
+
+        function addToast(msg){
+            $.Toast("提示", msg, "success", {
+                stack: true,
+                has_icon:true,
+                has_close_btn:true,
+                fullscreen:false,
+                timeout:3000,
+                sticky:false,
+                has_progress:true,
+                rtl:false,
+            });
+        }
+
+    </script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to 
+        <span id="name">meryl</span>
+    </p>
+    
+    <div>
+        <div id="client-count"></div>
+        在线用户：<span id="clients"></span>
+    </div>
+    <br>
+    <div id="msg" style="background-color:#ddd;border:1px solid #aaa"></div>
+  </body>
+</html>
+
