@@ -4,5 +4,10 @@ stages:
   - runScriptConfig:
       image: node:latest
       shellScript: npm install
+- name: run
+  steps:
+  - runScriptConfig:
+      image: node:latest
+      shellScript: npm start
 timeout: 60
 notification: {}
